@@ -1,0 +1,19 @@
+li {
+    list-style-type: none;
+  }
+  
+
+input.todo-item {
+    margin-left: 10px;
+    margin-right: 10px;
+  }  
+
+a.todo-item {
+    float: right;
+    margin-right: 10px;
+    cursor: pointer;
+    }
+
+.completed {
+    text-decoration: line-through;
+}
