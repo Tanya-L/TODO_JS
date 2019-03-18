@@ -1,36 +1,68 @@
+let myList = [];
+let myCount = 0;
 $(document).ready(function () {
     // code here
+    let loaded = localStorage.getItem('todo-items') || '{"count": 0, "items": {}}';
+    loaded = JSON.parse(loaded);
+    myList = loaded.items;
+    myCount = loaded.count;
+
+    for (let task in myList) {
+        addItem(task, myList[task].text, myList[task].completed);
+    }
+
     $('#todo-form').submit(function (event) {
         // alert("Form submitted");
         let item = $('#todo-list-item').val();
         event.preventDefault();
 
         if (item !== "") {
-            let newItem = $("<li></li>").text(item);
-            let newCheck = $('<input type="checkbox" class="todo-item checkbox"/>');
-            
-            //if the checkbox is Checked
-            newCheck.click(function () {
-                $(this).parent().toggleClass('completed');
-            })
-
-            let deleteLink = $('<a href="#" class="todo-item">x</a> <hr/>').click(function (event) {
-                newItem.remove();
-            });
+            addItem(myCount, item, false);
 
             // clear textbox
             $("#todo-list-item").val("");
 
-            // add checkbox and delete link
-            newItem.prepend(newCheck).append(deleteLink);
+            myList[myCount] = { text: item, completed: false };
+            myCount += 1;
 
+            save();
 
-
-
-            $('#todo-items').append(newItem);
         }
+
+
     });
 
 });
 
+function save() {
+    // store counter and list items
+    let storage = { count: myCount, items: myList };
+    localStorage.setItem("todo-items", JSON.stringify(storage));
+}
 
+function addItem(id, text, completed) {
+    let newItem = $("<li></li>").text(text);
+    let newCheck = $('<input type="checkbox" class="todo-item checkbox"/>');
+
+    //if the checkbox is Checked
+    newCheck.click(function () {
+        $(this).parent().toggleClass('completed');
+        myList[id].completed = $(this).is(':checked');
+        save();
+    })
+    if (completed) {
+        newCheck.prop('checked', true);
+    }
+
+    let deleteLink = $('<a href="#" class="todo-item">x</a> <hr/>').click(function (event) {
+        newItem.remove();
+        delete myList[id];
+        save();
+    });
+
+    // add checkbox and delete link
+    newItem.prepend(newCheck).append(deleteLink);
+
+    $('#todo-items').append(newItem);
+
+}
